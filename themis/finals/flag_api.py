@@ -59,20 +59,16 @@ class FlagAPIHelper(object):
         results = list()
         for r in responses:
             flag = r.request.body
-            if r.status_code == requests.codes.ok:
+            possible_codes = [
+                requests.codes.ok,
+                requests.codes.bad_request,
+                requests.codes.forbidden
+            ]
+            print(r.text)
+            if r.status_code in possible_codes:
                 results.append(dict(
                     flag=flag,
                     code=self._safe_create_result(r.text)
-                ))
-            elif r.status_code == requests.codes.bad_request:
-                results.append(dict(
-                    flag=flag,
-                    code=self._safe_create_result(r.text)
-                ))
-            elif r.status_code == requests.codes.forbidden:
-                results.append(dict(
-                    flag=flag,
-                    code=SubmitResult.ERROR_ACCESS_DENIED
                 ))
             elif r.status_code == requests.codes.too_many_requests:
                 results.append(dict(
