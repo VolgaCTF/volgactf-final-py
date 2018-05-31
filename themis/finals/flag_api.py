@@ -30,10 +30,11 @@ class GetinfoResult(Enum):
 
 
 class FlagAPIHelper(object):
-    def __init__(self, host):
+    def __init__(self, host, exception_handler=None):
         self._host = host
         self._port = 80
         self._url_path = 'api/flag/v1'
+        self._exception_handler = exception_handler
 
     @property
     def submit_url(self):
@@ -43,7 +44,7 @@ class FlagAPIHelper(object):
             self._url_path
         )
 
-    def _safe_create_result(self, text):
+    def _safe_create_submit_result(self, text):
         try:
             r = SubmitResult[text]
         except KeyError:
@@ -55,25 +56,25 @@ class FlagAPIHelper(object):
         u = self.submit_url
         h = {'Content-Type': 'text/plain'}
         pending = (grequests.post(u, data=f, headers=h) for f in flags)
-        responses = grequests.map(pending)
+        responses = grequests.map(pending,
+                                  exception_handler=self._exception_handler)
         results = list()
+        possible_codes = [
+            requests.codes.ok,
+            requests.codes.bad_request,
+            requests.codes.forbidden,
+            requests.codes.request_entity_too_large,
+            requests.codes.too_many_requests
+        ]
+
         for r in responses:
+            if r is None:
+                continue
             flag = r.request.body
-            possible_codes = [
-                requests.codes.ok,
-                requests.codes.bad_request,
-                requests.codes.forbidden
-            ]
-            print(r.text)
             if r.status_code in possible_codes:
                 results.append(dict(
                     flag=flag,
-                    code=self._safe_create_result(r.text)
-                ))
-            elif r.status_code == requests.codes.too_many_requests:
-                results.append(dict(
-                    flag=flag,
-                    code=SubmitResult.ERROR_RATELIMIT
+                    code=self._safe_create_submit_result(r.text)
                 ))
             else:
                 results.append(dict(
@@ -94,11 +95,28 @@ class FlagAPIHelper(object):
     def construct_getinfo_url(self, flag):
         return self.getinfo_url_base + flag
 
+    def _safe_create_getinfo_result(self, text):
+        try:
+            r = GetinfoResult[text]
+        except KeyError:
+            r = GetinfoResult.ERROR_UNKNOWN
+
+        return r
+
     def getinfo(self, *flags):
         pending = (grequests.get(self.construct_getinfo_url(f)) for f in flags)
-        responses = grequests.map(pending)
+        responses = grequests.map(pending,
+                                  exception_handler=self._exception_handler)
         results = list()
+        possible_error_codes = [
+            requests.codes.forbidden,
+            requests.codes.not_found,
+            requests.codes.too_many_requests
+        ]
+
         for r in responses:
+            if r is None:
+                continue
             flag = r.request.url[len(self.getinfo_url_base):]
             if r.status_code == requests.codes.ok:
                 data = r.json()
@@ -111,20 +129,10 @@ class FlagAPIHelper(object):
                     nbf=dateutil.parser.parse(data['nbf']),
                     exp=dateutil.parser.parse(data['exp'])
                 ))
-            elif r.status_code == requests.codes.forbidden:
+            elif r.status_code in possible_error_codes:
                 results.append(dict(
                     flag=flag,
-                    code=GetinfoResult.ERROR_ACCESS_DENIED
-                ))
-            elif r.status_code == requests.codes.not_found:
-                results.append(dict(
-                    flag=flag,
-                    code=GetinfoResult.ERROR_NOT_FOUND
-                ))
-            elif r.status_code == requests.codes.too_many_requests:
-                results.append(dict(
-                    flag=flag,
-                    code=GetinfoResult.ERROR_RATELIMIT
+                    code=self._safe_create_getinfo_result(r.text)
                 ))
             else:
                 results.append(dict(

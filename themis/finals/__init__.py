@@ -23,6 +23,10 @@ def flag_cli():
     pass
 
 
+def print_request_exception(request, exception):
+    click.echo(click.style(repr(exception), fg='red'))
+
+
 def print_submit_results(results):
     click.echo('')
     for r in results:
@@ -38,7 +42,8 @@ def print_submit_results(results):
 @flag_cli.command()
 @click.argument('flags', nargs=-1)
 def submit(flags):
-    h = FlagAPIHelper(get_api_endpoint())
+    h = FlagAPIHelper(get_api_endpoint(),
+                      exception_handler=print_request_exception)
     results = h.submit(*flags)
     print_submit_results(results)
 
@@ -73,7 +78,8 @@ def print_getinfo_results(results):
 @flag_cli.command()
 @click.argument('flags', nargs=-1)
 def getinfo(flags):
-    h = FlagAPIHelper(get_api_endpoint())
+    h = FlagAPIHelper(get_api_endpoint(),
+                      exception_handler=print_request_exception)
     results = h.getinfo(*flags)
     print_getinfo_results(results)
 
