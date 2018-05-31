@@ -4,6 +4,9 @@ import os
 import click
 
 from .flag_api import SubmitResult, GetinfoResult, FlagAPIHelper
+from .capsule_api import (
+    GetPublicKeyResult, DecodeResult, CapsuleAPIHelper
+)
 
 
 def get_api_endpoint():
@@ -73,3 +76,43 @@ def getinfo(flags):
     h = FlagAPIHelper(get_api_endpoint())
     results = h.getinfo(*flags)
     print_getinfo_results(results)
+
+
+@cli.group(name='capsule')
+def capsule_cli():
+    pass
+
+
+def print_public_key_result(result):
+    click.echo('')
+    if result['code'] == GetPublicKeyResult.SUCCESS:
+        click.echo(click.style(result['code'].name, bold=True, fg='green'))
+        click.echo(result['public_key'])
+    else:
+        click.echo(click.style(result['code'].name, bold=True, fg='red'))
+
+
+@capsule_cli.command()
+def public_key():
+    h = CapsuleAPIHelper(get_api_endpoint())
+    result = h.get_public_key()
+    print_public_key_result(result)
+
+
+def print_decode_result(result):
+    click.echo('')
+    if result['code'] == DecodeResult.SUCCESS:
+        click.echo(click.style(result['code'].name, bold=True, fg='green'))
+        if 'flag' in result['decoded']:
+            click.echo(click.style('  Flag: ', bold=True, fg='yellow') +
+                       result['decoded']['flag'])
+    else:
+        click.echo(click.style(result['code'].name, bold=True, fg='red'))
+
+
+@capsule_cli.command()
+@click.argument('capsule')
+def decode(capsule):
+    h = CapsuleAPIHelper(get_api_endpoint())
+    result = h.decode(capsule)
+    print_decode_result(result)
