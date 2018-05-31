@@ -1,7 +1,5 @@
 # themis-finals-py
 [![PyPI](https://img.shields.io/pypi/v/themis.finals.svg?style=flat-square)](themis.finals)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/themis.finals.svg?style=flat-square)](themis.finals)
-[![PyPI - Implementation](https://img.shields.io/pypi/implementation/themis.finals.svg?style=flat-square)](themis.finals)
 [![PyPI - License](https://img.shields.io/pypi/l/themis.finals.svg?style=flat-square)](themis.finals)
 
 [Themis Finals](https://github.com/aspyatkin/themis-finals) CLI & public API library.
