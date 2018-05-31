@@ -32,7 +32,7 @@ class CapsuleAPIHelper(object):
     def get_public_key(self):
         try:
             r = requests.get(self.public_key_url)
-            if r.status_code == requests.codes.ok:
+            if r is not None and r.status_code == requests.codes.ok:
                 return dict(
                     code=GetPublicKeyResult.SUCCESS,
                     public_key=r.text

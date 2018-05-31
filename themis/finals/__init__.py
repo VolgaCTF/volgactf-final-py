@@ -106,6 +106,7 @@ def public_key():
 
 
 def print_decode_result(result):
+    print(result)
     click.echo('')
     if result['code'] == DecodeResult.SUCCESS:
         click.echo(click.style(result['code'].name, bold=True, fg='green'))
