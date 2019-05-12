@@ -28,7 +28,7 @@ setup(
         'click>=6.7',
         'python-dateutil>=2.6.0',
         'PyJWT>=1.6.4,<1.7.0',
-        'cryptography>=2.2.2,<2.3.0'
+        'cryptography>=2.3.0'
     ],
     extras_require={
         ':python_version<"3.4"': [
