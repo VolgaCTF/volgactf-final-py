@@ -1,18 +1,20 @@
-# themis-finals-py
-[![PyPI](https://img.shields.io/pypi/v/themis.finals.svg?style=flat-square)](themis.finals)
-[![PyPI - License](https://img.shields.io/pypi/l/themis.finals.svg?style=flat-square)](themis.finals)
+# volgactf.final
+[![PyPI](https://img.shields.io/pypi/v/volgactf.final.svg?style=flat-square)](volgactf.final)
+[![PyPI - License](https://img.shields.io/pypi/l/volgactf.final.svg?style=flat-square)](volgactf.final)
 
-[Themis Finals](https://github.com/aspyatkin/themis-finals) CLI & public API library.
+[VolgaCTF Final](https://github.com/VolgaCTF/volgactf-final) is an automatic checking system (ACS) for A/D CTF contests.
+
+This repository contains a CLI & public API library for Python 2/3.
 
 ## Installation
 ```
-$ pip install themis.finals
+$ pip install volgactf.final
 ```
 
 ## Flag API
 ### CLI mode
 ```
-$ THEMIS_FINALS_API_ENDPOINT=10.0.0.2 themis-finals flag getinfo 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
+$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final flag getinfo 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
 
 18adda0e7637fe8a3270808222b3a514=  SUCCESS
   Team: Lorem
@@ -27,19 +29,19 @@ $ THEMIS_FINALS_API_ENDPOINT=10.0.0.2 themis-finals flag getinfo 18adda0e7637fe8
   Not before: 5/30 16:19:37
   Expires: 5/30 16:24:37
 
-$ THEMIS_FINALS_API_ENDPOINT=10.0.0.2 themis-finals flag submit 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
+$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final flag submit 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
 
 18adda0e7637fe8a3270808222b3a514=  SUCCESS
 023897b20007996a0563ab92381f38cc=  SUCCESS
 ```
 
-**Note:** 10.0.0.2 stands for an IP address of contest checking system. You may specify FQDN as well.
+**Note:** 10.0.0.2 stands for an IP address of ACS. You may specify FQDN as well.
 
 You can submit several flags at once. Please take flag API rate limits into consideration.
 
 ### Library mode
 ```python
-from themis.finals.flag_api import FlagAPIHelper
+from volgactf.final.flag_api import FlagAPIHelper
 
 h = FlagAPIHelper('10.0.0.2')
 flags = [
@@ -54,12 +56,12 @@ r2 = h.submit(*flags)
 # [{'flag': u'18adda0e7637fe8a3270808222b3a514=', 'code': <SubmitResult.SUCCESS: 0>}, {'flag': u'023897b20007996a0563ab92381f38cc=', 'code': <SubmitResult.SUCCESS: 0>}]
 ```
 
-Result codes are specified in `themis.finals.flag_api.GetinfoResult` and `themis.finals.flag_api.SubmitResult` enums.
+Result codes are specified in `volgactf.final.flag_api.GetinfoResult` and `volgactf.final.flag_api.SubmitResult` enums.
 
 ## Capsule API
 ### CLI mode
 ```
-$ THEMIS_FINALS_API_ENDPOINT=10.0.0.2 themis-finals capsule public_key
+$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final capsule public_key
 
 SUCCESS
 -----BEGIN PUBLIC KEY-----
@@ -67,7 +69,7 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6O4HeeDG/p7CYoHrDh54SBV2RoYW
 oOvajNCsb0tBWPC6VZK2jTFhwzShgAnkwkUvzZMMdDiSmHCZOm5x6KZ25Q==
 -----END PUBLIC KEY-----
 
-$ THEMIS_FINALS_API_ENDPOINT=10.0.0.2 themis-finals capsule decode eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJmbGFnIjoiZTI0MWNhZDgwZmE1YzFlZGVlYTE1ZjllNjc4YWU4OTA9In0.5lRNzKi_EPcT_wm6i8X0uhwSrV8y8JW0HAATC0dURV8WIEkHsYWoDACd4laaqWdzkS8No-2QREvEF4f5eg4HFw
+$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final capsule decode eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJmbGFnIjoiZTI0MWNhZDgwZmE1YzFlZGVlYTE1ZjllNjc4YWU4OTA9In0.5lRNzKi_EPcT_wm6i8X0uhwSrV8y8JW0HAATC0dURV8WIEkHsYWoDACd4laaqWdzkS8No-2QREvEF4f5eg4HFw
 
 SUCCESS
   Flag: e241cad80fa5c1edeea15f9e678ae890=
@@ -75,7 +77,7 @@ SUCCESS
 
 ### Library mode
 ```python
-from themis.finals.capsule_api import CapsuleAPIHelper
+from volgactf.final.capsule_api import CapsuleAPIHelper
 
 h = CapsuleAPIHelper('10.0.0.2')
 
@@ -86,7 +88,7 @@ r2 = h.decode('eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJmbGFnIjoiZTI0MWNhZDgwZmE1
 # {'decoded': {u'flag': u'e241cad80fa5c1edeea15f9e678ae890='}, 'code': <DecodeResult.SUCCESS: 0>}
 ```
 
-Result codes are specified in `themis.finals.capsule_api.GetPublicKeyResult` and `themis.finals.capsule_api.DecodeResult` enums.
+Result codes are specified in `volgactf.final.capsule_api.GetPublicKeyResult` and `volgactf.final.capsule_api.DecodeResult` enums.
 
 ## License
-MIT @ [Alexander Pyatkin](https://github.com/aspyatkin)
+MIT @ [VolgaCTF](https://github.com/VolgaCTF)

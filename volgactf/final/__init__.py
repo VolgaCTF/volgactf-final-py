@@ -10,7 +10,7 @@ from .capsule_api import (
 
 
 def get_api_endpoint():
-    return os.getenv('THEMIS_FINALS_API_ENDPOINT')
+    return os.getenv('VOLGACTF_FINAL_API_ENDPOINT')
 
 
 @click.group()
