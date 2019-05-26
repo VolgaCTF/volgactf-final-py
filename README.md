@@ -110,6 +110,9 @@ r1 = h.list()
 
 r2 = h.get_status(1, 2)
 # [{'service_id': 1, 'code': <GetServiceStatusResult.UP: 0>}, {'service_id': 2, 'code': <GetServiceStatusResult.NOT_UP: 2>}]
+
+r3 = h.is_up(1)
+# True
 ```
 
 Result codes are specified in `volgactf.final.service_api.ListResult` and `volgactf.final.service_api.GetServiceStatusResult` enums.

@@ -97,4 +97,4 @@ class ServiceAPIHelper(object):
         return results
 
     def is_up(self, service_id):
-        r = self.get_status(service_id)[0]['code'] == GetServiceStatusResult.UP
+        return self.get_status(service_id)[0]['code'] == GetServiceStatusResult.UP
