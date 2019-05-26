@@ -3,12 +3,12 @@ import os
 
 import click
 
-from .flag_api import SubmitResult, GetinfoResult, FlagAPIHelper
+from .flag_api import SubmitResult, GetInfoResult, FlagAPIHelper
 from .capsule_api import (
     GetPublicKeyResult, DecodeResult, CapsuleAPIHelper
 )
 from .service_api import (
-    GetServiceListResult, GetServiceStatusResult, ServiceAPIHelper
+    ListResult, GetServiceStatusResult, ServiceAPIHelper
 )
 
 
@@ -30,8 +30,7 @@ def print_request_exception(request, exception):
     click.echo(click.style(repr(exception), fg='red'))
 
 
-def print_submit_results(results):
-    click.echo('')
+def print_flag_submit_results(results):
     for r in results:
         flag_part = click.style(r['flag'], bold=True)
         status_part = None
@@ -39,25 +38,23 @@ def print_submit_results(results):
             status_part = click.style(r['code'].name, fg='green')
         else:
             status_part = click.style(r['code'].name, fg='red')
-        click.echo(flag_part + '  ' + status_part)
+        click.echo(flag_part + ' ' + status_part)
 
 
-@flag_cli.command()
+@flag_cli.command(name='submit')
 @click.argument('flags', nargs=-1)
-def submit(flags):
+def flag_submit(flags):
     h = FlagAPIHelper(get_api_endpoint(),
                       exception_handler=print_request_exception)
-    results = h.submit(*flags)
-    print_submit_results(results)
+    print_flag_submit_results(h.submit(*flags))
 
 
-def print_getinfo_results(results):
-    click.echo('')
+def print_flag_info_results(results):
     for r in results:
         flag_part = click.style(r['flag'], bold=True)
         status_part = None
         extra_part = ''
-        if r['code'] == GetinfoResult.SUCCESS:
+        if r['code'] == GetInfoResult.SUCCESS:
             status_part = click.style(r['code'].name, fg='green')
             extra_part += click.style('\n  Team: ', bold=True, fg='yellow')
             extra_part += click.style(r['team'])
@@ -78,13 +75,12 @@ def print_getinfo_results(results):
         click.echo(flag_part + ' ' + status_part + extra_part)
 
 
-@flag_cli.command()
+@flag_cli.command(name='info')
 @click.argument('flags', nargs=-1)
-def getinfo(flags):
+def flag_info(flags):
     h = FlagAPIHelper(get_api_endpoint(),
                       exception_handler=print_request_exception)
-    results = h.getinfo(*flags)
-    print_getinfo_results(results)
+    print_flag_info_results(h.get_info(*flags))
 
 
 @cli.group(name='capsule')
@@ -92,40 +88,35 @@ def capsule_cli():
     pass
 
 
-def print_public_key_result(result):
-    click.echo('')
-    if result['code'] == GetPublicKeyResult.SUCCESS:
-        click.echo(click.style(result['code'].name, bold=True, fg='green'))
-        click.echo(result['public_key'])
+def print_capsule_public_key_result(r):
+    if r['code'] == GetPublicKeyResult.SUCCESS:
+        click.echo(click.style(r['code'].name, bold=True, fg='green'))
+        click.echo(r['public_key'])
     else:
-        click.echo(click.style(result['code'].name, bold=True, fg='red'))
+        click.echo(click.style(r['code'].name, bold=True, fg='red'))
 
 
-@capsule_cli.command()
-def public_key():
+@capsule_cli.command(name='public_key')
+def capsule_public_key():
     h = CapsuleAPIHelper(get_api_endpoint())
-    result = h.get_public_key()
-    print_public_key_result(result)
+    print_capsule_public_key_result(h.get_public_key())
 
 
-def print_decode_result(result):
-    print(result)
-    click.echo('')
-    if result['code'] == DecodeResult.SUCCESS:
-        click.echo(click.style(result['code'].name, bold=True, fg='green'))
-        if 'flag' in result['decoded']:
+def print_capsule_decode_result(r):
+    if r['code'] == DecodeResult.SUCCESS:
+        click.echo(click.style(r['code'].name, bold=True, fg='green'))
+        if 'flag' in r['decoded']:
             click.echo(click.style('Flag: ', bold=True, fg='yellow') +
-                       result['decoded']['flag'])
+                       r['decoded']['flag'])
     else:
-        click.echo(click.style(result['code'].name, bold=True, fg='red'))
+        click.echo(click.style(r['code'].name, bold=True, fg='red'))
 
 
-@capsule_cli.command()
+@capsule_cli.command(name='decode')
 @click.argument('capsule')
-def decode(capsule):
+def capsule_decode(capsule):
     h = CapsuleAPIHelper(get_api_endpoint())
-    result = h.decode(capsule)
-    print_decode_result(result)
+    print_capsule_decode_result(h.decode(capsule))
 
 
 @cli.group(name='service')
@@ -133,24 +124,22 @@ def service_cli():
     pass
 
 
-def print_service_list_result(result):
-    click.echo('')
-    if result['code'] == GetServiceListResult.SUCCESS:
-        click.echo(click.style(result['code'].name, bold=True, fg='green'))
-        for item in result['list']:
+def print_service_list_result(r):
+    if r['code'] == ListResult.SUCCESS:
+        click.echo(click.style(r['code'].name, bold=True, fg='green'))
+        for item in r['list']:
             click.echo(click.style('#{0:d} '.format(item['id']), bold=True) + click.style(item['name'], bold=True, fg='yellow'))
     else:
-        click.echo(click.style(result['code'].name, bold=True, fg='red'))
+        click.echo(click.style(r['code'].name, bold=True, fg='red'))
 
 
 @service_cli.command(name='list')
 def service_list():
     h = ServiceAPIHelper(get_api_endpoint())
-    result = h.get_service_list()
-    print_service_list_result(result)
+    print_service_list_result(h.list())
 
-def print_getstatus_results(results):
-    click.echo('')
+
+def print_service_status_results(results):
     for r in results:
         service_part = click.style('#{0:d}'.format(r['service_id']), bold=True)
         status_part = None
@@ -164,10 +153,9 @@ def print_getstatus_results(results):
         click.echo(service_part + ' ' + status_part)
 
 
-@service_cli.command()
+@service_cli.command(name='status')
 @click.argument('service_ids', nargs=-1, type=int)
-def getstatus(service_ids):
+def service_status(service_ids):
     h = ServiceAPIHelper(get_api_endpoint(),
                       exception_handler=print_request_exception)
-    results = h.getstatus(*service_ids)
-    print_getstatus_results(results)
+    print_service_status_results(h.get_status(*service_ids))

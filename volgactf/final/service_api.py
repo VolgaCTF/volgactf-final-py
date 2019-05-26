@@ -5,7 +5,7 @@ import grequests
 import requests
 
 
-class GetServiceListResult(Enum):
+class ListResult(Enum):
     SUCCESS = 0
     ERROR = 1
 
@@ -27,39 +27,39 @@ class ServiceAPIHelper(object):
         self._exception_handler = exception_handler
 
     @property
-    def service_list_url(self):
+    def list_url(self):
         return 'http://{0}:{1:d}/{2}/list'.format(
             self._host,
             self._port,
             self._url_path
         )
 
-    def get_service_list(self):
+    def list(self):
         try:
-            r = requests.get(self.service_list_url)
+            r = requests.get(self.list_url)
             if r is not None and r.status_code == requests.codes.ok:
                 data = r.json()
                 return dict(
-                    code=GetServiceListResult.SUCCESS,
+                    code=ListResult.SUCCESS,
                     list=data
                 )
             else:
-                return dict(code=GetServiceListResult.ERROR)
+                return dict(code=ListResult.ERROR)
         except Exception:
-            return dict(code=GetServiceListResult.ERROR)
+            return dict(code=ListResult.ERROR)
 
     @property
-    def getstatus_url_base(self):
+    def get_status_url_base(self):
         return 'http://{0}:{1:d}/{2}/status/'.format(
             self._host,
             self._port,
             self._url_path
         )
 
-    def construct_getstatus_url(self, service_id):
-        return self.getstatus_url_base + str(service_id)
+    def construct_get_status_url(self, service_id):
+        return self.get_status_url_base + str(service_id)
 
-    def _safe_create_getstatus_result(self, text):
+    def _safe_create_get_status_result(self, text):
         try:
             r = GetServiceStatusResult[text]
         except KeyError:
@@ -67,8 +67,8 @@ class ServiceAPIHelper(object):
 
         return r
 
-    def getstatus(self, *service_ids):
-        pending = (grequests.get(self.construct_getstatus_url(s)) for s in service_ids)
+    def get_status(self, *service_ids):
+        pending = (grequests.get(self.construct_get_status_url(s)) for s in service_ids)
         responses = grequests.map(pending,
                                   exception_handler=self._exception_handler)
         results = list()
@@ -82,11 +82,11 @@ class ServiceAPIHelper(object):
         for r in responses:
             if r is None:
                 continue
-            service_id = int(r.request.url[len(self.getstatus_url_base):])
+            service_id = int(r.request.url[len(self.get_status_url_base):])
             if r.status_code in possible_codes:
                 results.append(dict(
                     service_id=service_id,
-                    code=self._safe_create_getstatus_result(r.text)
+                    code=self._safe_create_get_status_result(r.text)
                 ))
             else:
                 results.append(dict(
@@ -97,4 +97,4 @@ class ServiceAPIHelper(object):
         return results
 
     def is_up(self, service_id):
-        r = self.getstatus(service_id)[0]['code'] == GetServiceStatusResult.UP
+        r = self.get_status(service_id)[0]['code'] == GetServiceStatusResult.UP

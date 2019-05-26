@@ -21,7 +21,7 @@ class SubmitResult(Enum):
     ERROR_SERVICE_STATE_INVALID = 12  # the attacking team service is not up
 
 
-class GetinfoResult(Enum):
+class GetInfoResult(Enum):
     SUCCESS = 0  # submitted flag has been accepted
     ERROR_UNKNOWN = 1  # generic error
     ERROR_ACCESS_DENIED = 2  # getinfo calls are allowed from a team's subnet
@@ -85,26 +85,26 @@ class FlagAPIHelper(object):
         return results
 
     @property
-    def getinfo_url_base(self):
+    def get_info_url_base(self):
         return 'http://{0}:{1:d}/{2}/info/'.format(
             self._host,
             self._port,
             self._url_path
         )
 
-    def construct_getinfo_url(self, flag):
-        return self.getinfo_url_base + flag
+    def construct_get_info_url(self, flag):
+        return self.get_info_url_base + flag
 
-    def _safe_create_getinfo_result(self, text):
+    def _safe_create_get_info_result(self, text):
         try:
-            r = GetinfoResult[text]
+            r = GetInfoResult[text]
         except KeyError:
-            r = GetinfoResult.ERROR_UNKNOWN
+            r = GetInfoResult.ERROR_UNKNOWN
 
         return r
 
-    def getinfo(self, *flags):
-        pending = (grequests.get(self.construct_getinfo_url(f)) for f in flags)
+    def get_info(self, *flags):
+        pending = (grequests.get(self.construct_get_info_url(f)) for f in flags)
         responses = grequests.map(pending,
                                   exception_handler=self._exception_handler)
         results = list()
@@ -117,12 +117,12 @@ class FlagAPIHelper(object):
         for r in responses:
             if r is None:
                 continue
-            flag = r.request.url[len(self.getinfo_url_base):]
+            flag = r.request.url[len(self.get_info_url_base):]
             if r.status_code == requests.codes.ok:
                 data = r.json()
                 results.append(dict(
                     flag=flag,
-                    code=GetinfoResult.SUCCESS,
+                    code=GetInfoResult.SUCCESS,
                     team=data['team'],
                     service=data['service'],
                     round=data['round'],
@@ -132,12 +132,12 @@ class FlagAPIHelper(object):
             elif r.status_code in possible_error_codes:
                 results.append(dict(
                     flag=flag,
-                    code=self._safe_create_getinfo_result(r.text)
+                    code=self._safe_create_get_info_result(r.text)
                 ))
             else:
                 results.append(dict(
                     flag=flag,
-                    code=GetinfoResult.ERROR_UNKNOWN
+                    code=GetInfoResult.ERROR_UNKNOWN
                 ))
 
         return results
