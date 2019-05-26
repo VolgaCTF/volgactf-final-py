@@ -31,8 +31,8 @@ $ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final flag getinfo 18adda0e7637f
 
 $ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final flag submit 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
 
-18adda0e7637fe8a3270808222b3a514=  SUCCESS
-023897b20007996a0563ab92381f38cc=  SUCCESS
+18adda0e7637fe8a3270808222b3a514= SUCCESS
+023897b20007996a0563ab92381f38cc= SUCCESS
 ```
 
 **Note:** 10.0.0.2 stands for an IP address of ACS. You may specify FQDN as well.
@@ -72,7 +72,7 @@ oOvajNCsb0tBWPC6VZK2jTFhwzShgAnkwkUvzZMMdDiSmHCZOm5x6KZ25Q==
 $ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final capsule decode eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJmbGFnIjoiZTI0MWNhZDgwZmE1YzFlZGVlYTE1ZjllNjc4YWU4OTA9In0.5lRNzKi_EPcT_wm6i8X0uhwSrV8y8JW0HAATC0dURV8WIEkHsYWoDACd4laaqWdzkS8No-2QREvEF4f5eg4HFw
 
 SUCCESS
-  Flag: e241cad80fa5c1edeea15f9e678ae890=
+Flag: e241cad80fa5c1edeea15f9e678ae890=
 ```
 
 ### Library mode
@@ -89,6 +89,24 @@ r2 = h.decode('eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJmbGFnIjoiZTI0MWNhZDgwZmE1
 ```
 
 Result codes are specified in `volgactf.final.capsule_api.GetPublicKeyResult` and `volgactf.final.capsule_api.DecodeResult` enums.
+
+## Service API
+### CLI mode
+```
+$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final service list
+
+SUCCESS
+
+#1 Lorem
+#2 Ipsum
+
+$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final service getstatus 1 2
+
+#1 UP
+#2 NOT_UP
+```
+
+Result codes are specified in `volgactf.final.service_api.GetServiceListResult` and `volgactf.final.service_api.GetServiceStatusResult` enums.
 
 ## License
 MIT @ [VolgaCTF](https://github.com/VolgaCTF)

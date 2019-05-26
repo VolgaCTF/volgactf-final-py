@@ -7,6 +7,9 @@ from .flag_api import SubmitResult, GetinfoResult, FlagAPIHelper
 from .capsule_api import (
     GetPublicKeyResult, DecodeResult, CapsuleAPIHelper
 )
+from .service_api import (
+    GetServiceListResult, GetServiceStatusResult, ServiceAPIHelper
+)
 
 
 def get_api_endpoint():
@@ -72,7 +75,7 @@ def print_getinfo_results(results):
         else:
             status_part = click.style(r['code'].name, fg='red')
 
-        click.echo(flag_part + '  ' + status_part + extra_part)
+        click.echo(flag_part + ' ' + status_part + extra_part)
 
 
 @flag_cli.command()
@@ -111,7 +114,7 @@ def print_decode_result(result):
     if result['code'] == DecodeResult.SUCCESS:
         click.echo(click.style(result['code'].name, bold=True, fg='green'))
         if 'flag' in result['decoded']:
-            click.echo(click.style('  Flag: ', bold=True, fg='yellow') +
+            click.echo(click.style('Flag: ', bold=True, fg='yellow') +
                        result['decoded']['flag'])
     else:
         click.echo(click.style(result['code'].name, bold=True, fg='red'))
@@ -123,3 +126,48 @@ def decode(capsule):
     h = CapsuleAPIHelper(get_api_endpoint())
     result = h.decode(capsule)
     print_decode_result(result)
+
+
+@cli.group(name='service')
+def service_cli():
+    pass
+
+
+def print_service_list_result(result):
+    click.echo('')
+    if result['code'] == GetServiceListResult.SUCCESS:
+        click.echo(click.style(result['code'].name, bold=True, fg='green'))
+        for item in result['list']:
+            click.echo(click.style('#{0:d} '.format(item['id']), bold=True) + click.style(item['name'], bold=True, fg='yellow'))
+    else:
+        click.echo(click.style(result['code'].name, bold=True, fg='red'))
+
+
+@service_cli.command(name='list')
+def service_list():
+    h = ServiceAPIHelper(get_api_endpoint())
+    result = h.get_service_list()
+    print_service_list_result(result)
+
+def print_getstatus_results(results):
+    click.echo('')
+    for r in results:
+        service_part = click.style('#{0:d}'.format(r['service_id']), bold=True)
+        status_part = None
+        if r['code'] == GetServiceStatusResult.UP:
+            status_part = click.style(r['code'].name, fg='green')
+        elif r['code'] == GetServiceStatusResult.NOT_UP:
+            status_part = click.style(r['code'].name, fg='yellow')
+        else:
+            status_part = click.style(r['code'].name, fg='red')
+
+        click.echo(service_part + ' ' + status_part)
+
+
+@service_cli.command()
+@click.argument('service_ids', nargs=-1, type=int)
+def getstatus(service_ids):
+    h = ServiceAPIHelper(get_api_endpoint(),
+                      exception_handler=print_request_exception)
+    results = h.getstatus(*service_ids)
+    print_getstatus_results(results)
