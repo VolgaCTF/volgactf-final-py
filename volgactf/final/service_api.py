@@ -73,6 +73,7 @@ class ServiceAPIHelper(object):
                                   exception_handler=self._exception_handler)
         results = list()
         possible_codes = [
+            requests.codes.ok,
             requests.codes.forbidden,
             requests.codes.not_found,
             requests.codes.too_many_requests
