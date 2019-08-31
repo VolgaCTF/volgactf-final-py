@@ -33,7 +33,9 @@ $ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final flag submit 18adda0e7637fe
 023897b20007996a0563ab92381f38cc= SUCCESS
 ```
 
-**Note:** 10.0.0.2 stands for an IP address of ACS. You may specify FQDN as well.
+**Note 1.** 10.0.0.2 stands for an IP address of ACS. You may specify FQDN as well.
+
+**Note 2.** In the event of a non-standard port, use `HOST:PORT` for `VOLGACTF_FINAL_API_ENDPOINT` (e.g. `10.0.0.2:8080`).
 
 You can submit several flags at once. Please take flag API rate limits into consideration.
 
@@ -41,7 +43,7 @@ You can submit several flags at once. Please take flag API rate limits into cons
 ```python
 from volgactf.final.flag_api import FlagAPIHelper
 
-h = FlagAPIHelper('10.0.0.2')
+h = FlagAPIHelper('10.0.0.2')  # Use 'HOST:PORT' (e.g. '10.0.0.2:8080') in the event of a non-standard port
 flags = [
     '18adda0e7637fe8a3270808222b3a514=',
     '023897b20007996a0563ab92381f38cc='
@@ -75,7 +77,7 @@ Flag: e241cad80fa5c1edeea15f9e678ae890=
 ```python
 from volgactf.final.capsule_api import CapsuleAPIHelper
 
-h = CapsuleAPIHelper('10.0.0.2')
+h = CapsuleAPIHelper('10.0.0.2')  # Use 'HOST:PORT' (e.g. '10.0.0.2:8080') in the event of a non-standard port
 
 r1 = h.get_public_key()
 # {'public_key': u'-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6O4HeeDG/p7CYoHrDh54SBV2RoYW\noOvajNCsb0tBWPC6VZK2jTFhwzShgAnkwkUvzZMMdDiSmHCZOm5x6KZ25Q==\n-----END PUBLIC KEY-----\n', 'code': <GetPublicKeyResult.SUCCESS: 0>}
@@ -103,7 +105,7 @@ $ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final service status 1 2
 ```python
 from volgactf.final.service_api import ServiceAPIHelper
 
-h = ServiceAPIHelper('10.0.0.2')
+h = ServiceAPIHelper('10.0.0.2')  # Use 'HOST:PORT' (e.g. '10.0.0.2:8080') in the event of a non-standard port
 
 r1 = h.list()
 # {'code': <ListResult.SUCCESS: 0>, 'list': [{'id': 1, 'name': 'Lorem'},{'id': 2, 'name': 'Ipsum'}]}
