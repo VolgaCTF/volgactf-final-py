@@ -31,20 +31,14 @@ class GetInfoResult(Enum):
 
 class FlagAPIHelper(object):
     def __init__(self, endpoint, exception_handler=None):
-        endpoint_parts = endpoint.split(':')
-        self._host = endpoint_parts[0]
-        if len(endpoint_parts) > 1:
-            self._port = int(endpoint_parts[1])
-        else:
-            self._port = 80
+        self._endpoint = endpoint
         self._url_path = 'api/flag/v1'
         self._exception_handler = exception_handler
 
     @property
     def submit_url(self):
-        return 'http://{0}:{1:d}/{2}/submit'.format(
-            self._host,
-            self._port,
+        return '{0}/{1}/submit'.format(
+            self._endpoint,
             self._url_path
         )
 
@@ -90,9 +84,8 @@ class FlagAPIHelper(object):
 
     @property
     def get_info_url_base(self):
-        return 'http://{0}:{1:d}/{2}/info/'.format(
-            self._host,
-            self._port,
+        return '{0}/{1}/info/'.format(
+            self._endpoint,
             self._url_path
         )
 

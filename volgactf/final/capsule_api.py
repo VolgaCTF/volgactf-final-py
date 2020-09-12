@@ -17,19 +17,13 @@ class DecodeResult(Enum):
 
 class CapsuleAPIHelper(object):
     def __init__(self, endpoint):
-        endpoint_parts = endpoint.split(':')
-        self._host = endpoint_parts[0]
-        if len(endpoint_parts) > 1:
-            self._port = int(endpoint_parts[1])
-        else:
-            self._port = 80
+        self._endpoint = endpoint
         self._url_path = 'api/capsule/v1'
 
     @property
     def public_key_url(self):
-        return 'http://{0}:{1:d}/{2}/public_key'.format(
-            self._host,
-            self._port,
+        return '{0}/{1}/public_key'.format(
+            self._endpoint,
             self._url_path
         )
 

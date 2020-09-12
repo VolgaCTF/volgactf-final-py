@@ -14,7 +14,7 @@ $ pip install volgactf.final
 ## Flag API
 ### CLI mode
 ```
-$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final flag info 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
+$ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final flag info 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
 18adda0e7637fe8a3270808222b3a514= SUCCESS
   Team: Lorem
   Service: Ipsum
@@ -28,14 +28,12 @@ $ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final flag info 18adda0e7637fe8a
   Not before: 5/30 16:19:37
   Expires: 5/30 16:24:37
 
-$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final flag submit 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
+$ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final flag submit 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
 18adda0e7637fe8a3270808222b3a514= SUCCESS
 023897b20007996a0563ab92381f38cc= SUCCESS
 ```
 
-**Note 1.** 10.0.0.2 stands for an IP address of ACS. You may specify FQDN as well.
-
-**Note 2.** In the event of a non-standard port, use `HOST:PORT` for `VOLGACTF_FINAL_API_ENDPOINT` (e.g. `10.0.0.2:8080`).
+**Note 1.** https://final.volgactf.ru stands for an ACS endpoint.
 
 You can submit several flags at once. Please take flag API rate limits into consideration.
 
@@ -43,7 +41,8 @@ You can submit several flags at once. Please take flag API rate limits into cons
 ```python
 from volgactf.final.flag_api import FlagAPIHelper
 
-h = FlagAPIHelper('10.0.0.2')  # Use 'HOST:PORT' (e.g. '10.0.0.2:8080') in the event of a non-standard port
+h = FlagAPIHelper('https://final.volgactf.ru')
+
 flags = [
     '18adda0e7637fe8a3270808222b3a514=',
     '023897b20007996a0563ab92381f38cc='
@@ -61,14 +60,14 @@ Result codes are specified in `volgactf.final.flag_api.GetInfoResult` and `volga
 ## Capsule API
 ### CLI mode
 ```
-$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final capsule public_key
+$ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final capsule public_key
 SUCCESS
 -----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6O4HeeDG/p7CYoHrDh54SBV2RoYW
 oOvajNCsb0tBWPC6VZK2jTFhwzShgAnkwkUvzZMMdDiSmHCZOm5x6KZ25Q==
 -----END PUBLIC KEY-----
 
-$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final capsule decode eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJmbGFnIjoiZTI0MWNhZDgwZmE1YzFlZGVlYTE1ZjllNjc4YWU4OTA9In0.5lRNzKi_EPcT_wm6i8X0uhwSrV8y8JW0HAATC0dURV8WIEkHsYWoDACd4laaqWdzkS8No-2QREvEF4f5eg4HFw
+$ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final capsule decode eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJmbGFnIjoiZTI0MWNhZDgwZmE1YzFlZGVlYTE1ZjllNjc4YWU4OTA9In0.5lRNzKi_EPcT_wm6i8X0uhwSrV8y8JW0HAATC0dURV8WIEkHsYWoDACd4laaqWdzkS8No-2QREvEF4f5eg4HFw
 SUCCESS
 Flag: e241cad80fa5c1edeea15f9e678ae890=
 ```
@@ -77,7 +76,7 @@ Flag: e241cad80fa5c1edeea15f9e678ae890=
 ```python
 from volgactf.final.capsule_api import CapsuleAPIHelper
 
-h = CapsuleAPIHelper('10.0.0.2')  # Use 'HOST:PORT' (e.g. '10.0.0.2:8080') in the event of a non-standard port
+h = CapsuleAPIHelper('https://final.volgactf.ru')
 
 r1 = h.get_public_key()
 # {'public_key': u'-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6O4HeeDG/p7CYoHrDh54SBV2RoYW\noOvajNCsb0tBWPC6VZK2jTFhwzShgAnkwkUvzZMMdDiSmHCZOm5x6KZ25Q==\n-----END PUBLIC KEY-----\n', 'code': <GetPublicKeyResult.SUCCESS: 0>}
@@ -91,12 +90,12 @@ Result codes are specified in `volgactf.final.capsule_api.GetPublicKeyResult` an
 ## Service API
 ### CLI mode
 ```
-$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final service list
+$ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final service list
 SUCCESS
 #1 Lorem
 #2 Ipsum
 
-$ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final service status 1 2
+$ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final service status 1 2
 #1 UP
 #2 NOT_UP
 ```
@@ -105,7 +104,7 @@ $ VOLGACTF_FINAL_API_ENDPOINT=10.0.0.2 volgactf-final service status 1 2
 ```python
 from volgactf.final.service_api import ServiceAPIHelper
 
-h = ServiceAPIHelper('10.0.0.2')  # Use 'HOST:PORT' (e.g. '10.0.0.2:8080') in the event of a non-standard port
+h = ServiceAPIHelper('https://final.volgactf.ru')
 
 r1 = h.list()
 # {'code': <ListResult.SUCCESS: 0>, 'list': [{'id': 1, 'name': 'Lorem'},{'id': 2, 'name': 'Ipsum'}]}
