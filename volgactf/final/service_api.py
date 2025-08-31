@@ -20,10 +20,14 @@ class GetServiceStatusResult(Enum):
 
 
 class ServiceAPIHelper(object):
-    def __init__(self, endpoint, exception_handler=None):
+    def __init__(self, endpoint, exception_handler=None, proxy=None, verify=True):
         self._endpoint = endpoint
         self._url_path = 'api/service/v1'
         self._exception_handler = exception_handler
+        self._proxies = dict()
+        if proxy is not None:
+            self._proxies[endpoint] = proxy
+        self._verify = verify
 
     @property
     def list_url(self):
@@ -34,7 +38,7 @@ class ServiceAPIHelper(object):
 
     def list(self):
         try:
-            r = requests.get(self.list_url)
+            r = requests.get(self.list_url, proxies=self._proxies, verify=self._verify)
             if r is not None and r.status_code == requests.codes.ok:
                 data = r.json()
                 return dict(
@@ -65,7 +69,7 @@ class ServiceAPIHelper(object):
         return r
 
     def get_status(self, *service_ids):
-        pending = (grequests.get(self.construct_get_status_url(s)) for s in service_ids)
+        pending = (grequests.get(self.construct_get_status_url(s), proxies=self._proxies, verify=self._verify) for s in service_ids)
         responses = grequests.map(pending,
                                   exception_handler=self._exception_handler)
         results = list()

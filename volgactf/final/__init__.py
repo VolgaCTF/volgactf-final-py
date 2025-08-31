@@ -16,6 +16,17 @@ def get_api_endpoint():
     return os.getenv('VOLGACTF_FINAL_API_ENDPOINT')
 
 
+def get_proxy():
+    return os.getenv('VOLGACTF_FINAL_PROXY', '') or None
+
+
+def get_verify():
+    str_value = os.getenv('VOLGACTF_FINAL_VERIFY', 'True')
+    if str_value in ('True', 'False'):
+        return str_value == 'True'
+    else:
+        return str_value
+
 @click.group()
 def cli():
     pass
@@ -45,7 +56,8 @@ def print_flag_submit_results(results):
 @click.argument('flags', nargs=-1)
 def flag_submit(flags):
     h = FlagAPIHelper(get_api_endpoint(),
-                      exception_handler=print_request_exception)
+                      exception_handler=print_request_exception,
+                      proxy=get_proxy(), verify=get_verify())
     print_flag_submit_results(h.submit(*flags))
 
 
@@ -79,7 +91,9 @@ def print_flag_info_results(results):
 @click.argument('flags', nargs=-1)
 def flag_info(flags):
     h = FlagAPIHelper(get_api_endpoint(),
-                      exception_handler=print_request_exception)
+                      exception_handler=print_request_exception,
+                      proxy=get_proxy(),
+                      verify=get_verify())
     print_flag_info_results(h.get_info(*flags))
 
 
@@ -98,7 +112,7 @@ def print_capsule_public_key_result(r):
 
 @capsule_cli.command(name='public_key')
 def capsule_public_key():
-    h = CapsuleAPIHelper(get_api_endpoint())
+    h = CapsuleAPIHelper(get_api_endpoint(), get_proxy(), get_verify())
     print_capsule_public_key_result(h.get_public_key())
 
 
@@ -115,7 +129,7 @@ def print_capsule_decode_result(r):
 @capsule_cli.command(name='decode')
 @click.argument('capsule')
 def capsule_decode(capsule):
-    h = CapsuleAPIHelper(get_api_endpoint())
+    h = CapsuleAPIHelper(get_api_endpoint(), get_proxy(), get_verify())
     print_capsule_decode_result(h.decode(capsule))
 
 
@@ -135,7 +149,7 @@ def print_service_list_result(r):
 
 @service_cli.command(name='list')
 def service_list():
-    h = ServiceAPIHelper(get_api_endpoint())
+    h = ServiceAPIHelper(get_api_endpoint(), proxy=get_proxy(), verify=get_verify())
     print_service_list_result(h.list())
 
 
@@ -157,5 +171,6 @@ def print_service_status_results(results):
 @click.argument('service_ids', nargs=-1, type=int)
 def service_status(service_ids):
     h = ServiceAPIHelper(get_api_endpoint(),
-                      exception_handler=print_request_exception)
+                      exception_handler=print_request_exception,
+                      proxy=get_proxy(), verify=get_verify())
     print_service_status_results(h.get_status(*service_ids))

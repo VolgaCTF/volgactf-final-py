@@ -30,10 +30,14 @@ class GetInfoResult(Enum):
 
 
 class FlagAPIHelper(object):
-    def __init__(self, endpoint, exception_handler=None):
+    def __init__(self, endpoint, exception_handler=None, proxy=None, verify=True):
         self._endpoint = endpoint
         self._url_path = 'api/flag/v1'
         self._exception_handler = exception_handler
+        self._proxies = dict()
+        if proxy is not None:
+            self._proxies[endpoint] = proxy
+        self._verify = verify
 
     @property
     def submit_url(self):
@@ -53,7 +57,7 @@ class FlagAPIHelper(object):
     def submit(self, *flags):
         u = self.submit_url
         h = {'Content-Type': 'text/plain'}
-        pending = (grequests.post(u, data=f, headers=h) for f in flags)
+        pending = (grequests.post(u, data=f, headers=h, proxies=self._proxies, verify=self._verify) for f in flags)
         responses = grequests.map(pending,
                                   exception_handler=self._exception_handler)
         results = list()
@@ -101,7 +105,7 @@ class FlagAPIHelper(object):
         return r
 
     def get_info(self, *flags):
-        pending = (grequests.get(self.construct_get_info_url(f)) for f in flags)
+        pending = (grequests.get(self.construct_get_info_url(f), proxies=self._proxies, verify=self._verify) for f in flags)
         responses = grequests.map(pending,
                                   exception_handler=self._exception_handler)
         results = list()

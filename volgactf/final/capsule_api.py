@@ -16,8 +16,12 @@ class DecodeResult(Enum):
 
 
 class CapsuleAPIHelper(object):
-    def __init__(self, endpoint):
+    def __init__(self, endpoint, proxy=None, verify=True):
         self._endpoint = endpoint
+        self._proxies = dict()
+        if proxy is not None:
+            self._proxies[endpoint] = proxy
+        self._verify = verify
         self._url_path = 'api/capsule/v1'
 
     @property
@@ -29,7 +33,7 @@ class CapsuleAPIHelper(object):
 
     def get_public_key(self):
         try:
-            r = requests.get(self.public_key_url)
+            r = requests.get(self.public_key_url, proxies=self._proxies, verify=self._verify)
             if r is not None and r.status_code == requests.codes.ok:
                 return dict(
                     code=GetPublicKeyResult.SUCCESS,

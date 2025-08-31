@@ -4,7 +4,7 @@
 
 [VolgaCTF Final](https://github.com/VolgaCTF/volgactf-final) is an automatic checking system (ACS) for A/D CTF contests.
 
-This repository contains a CLI & public API library for Python 2/3.
+This repository contains a CLI & public API library for Python 3.
 
 ## Installation
 ```
