@@ -13,7 +13,7 @@ $ pip install volgactf.final
 
 ## Flag API
 ### CLI mode
-```
+```bash
 $ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final flag info 18adda0e7637fe8a3270808222b3a514= 023897b20007996a0563ab92381f38cc=
 18adda0e7637fe8a3270808222b3a514= SUCCESS
   Team: Lorem
@@ -59,7 +59,7 @@ Result codes are specified in `volgactf.final.flag_api.GetInfoResult` and `volga
 
 ## Capsule API
 ### CLI mode
-```
+```bash
 $ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final capsule public_key
 SUCCESS
 -----BEGIN PUBLIC KEY-----
@@ -89,7 +89,7 @@ Result codes are specified in `volgactf.final.capsule_api.GetPublicKeyResult` an
 
 ## Service API
 ### CLI mode
-```
+```bash
 $ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final service list
 SUCCESS
 #1 Lorem
@@ -117,6 +117,97 @@ r3 = h.is_up(1)
 ```
 
 Result codes are specified in `volgactf.final.service_api.ListResult` and `volgactf.final.service_api.GetServiceStatusResult` enums.
+
+## Open Data API
+### CLI mode
+```bash
+$ VOLGACTF_FINAL_API_ENDPOINT=https://final.volgactf.ru volgactf-final open_data --team-id 2 --service-id 1
+SUCCESS
+[
+  {
+    "round_id": 34,
+    "team_id": 2,
+    "service_id": 1,
+    "open_data": {
+      "username": "chk_c59edf8b4cf94c099037994ccf607858"
+    },
+    "expires": "2026-09-09T13:50:05+00:00"
+  },
+  {
+    "round_id": 35,
+    "team_id": 2,
+    "service_id": 1,
+    "open_data": {
+      "username": "chk_c99065f44fdd4f5ea76cfaeb16aae93a"
+    },
+    "expires": "2026-09-09T13:52:06+00:00"
+  },
+  {
+    "round_id": 36,
+    "team_id": 2,
+    "service_id": 1,
+    "open_data": {
+      "username": "chk_31a358df429e4b9faa440dbcdeda3a66"
+    },
+    "expires": "2026-09-09T13:54:06+00:00"
+  }
+]
+
+$ volgactf-final open_data --team-id 2 --service-id 1 --no-decode
+SUCCESS
+[
+  {
+    "round_id": 34,
+    "team_id": 2,
+    "service_id": 1,
+    "open_data": "{\"username\": \"chk_c59edf8b4cf94c099037994ccf607858\"}",
+    "expires": "2026-09-09T13:50:05+00:00"
+  },
+  {
+    "round_id": 35,
+    "team_id": 2,
+    "service_id": 1,
+    "open_data": "{\"username\": \"chk_c99065f44fdd4f5ea76cfaeb16aae93a\"}",
+    "expires": "2026-09-09T13:52:06+00:00"
+  },
+  {
+    "round_id": 36,
+    "team_id": 2,
+    "service_id": 1,
+    "open_data": "{\"username\": \"chk_31a358df429e4b9faa440dbcdeda3a66\"}",
+    "expires": "2026-09-09T13:54:06+00:00"
+  }
+]
+```
+
+Both `--team-id` and `--service-id` filters are optional. The command prints `SUCCESS` followed by the JSON
+list, or `ERROR` on failure.
+Use `--no-decode` to preserve the original payload strings. TLS verification is enabled by default.
+
+### Library mode
+```python
+from volgactf.final.open_data_api import OpenDataAPIHelper, OpenDataResult
+
+h = OpenDataAPIHelper('https://final.volgactf.test')
+r1 = h.open_data(team_id=2, service_id=1)
+# {'code': <OpenDataResult.SUCCESS: 0>, 'list': [{'round_id': 34, 'team_id': 2, 'service_id': 1, 'open_data': {'username': 'chk_c59edf8b4cf94c099037994ccf607858'}, 'expires': '2026-09-09T13:50:05+00:00'}, {'round_id': 35, 'team_id': 2, 'service_id': 1, 'open_data': {'username': 'chk_c99065f44fdd4f5ea76cfaeb16aae93a'}, 'expires': '2026-09-09T13:52:06+00:00'}, {'round_id': 36, 'team_id': 2, 'service_id': 1, 'open_data': {'username': 'chk_31a358df429e4b9faa440dbcdeda3a66'}, 'expires': '2026-09-09T13:54:06+00:00'}]}
+
+r2 = h.open_data(team_id=2, service_id=1, decode=False)
+# {'code': <OpenDataResult.SUCCESS: 0>, 'list': [{'round_id': 34, 'team_id': 2, 'service_id': 1, 'open_data': '{"username": "chk_c59edf8b4cf94c099037994ccf607858"}', 'expires': '2026-09-09T13:50:05+00:00'}, {'round_id': 35, 'team_id': 2, 'service_id': 1, 'open_data': '{"username": "chk_c99065f44fdd4f5ea76cfaeb16aae93a"}', 'expires': '2026-09-09T13:52:06+00:00'}, {'round_id': 36, 'team_id': 2, 'service_id': 1, 'open_data': '{"username": "chk_31a358df429e4b9faa440dbcdeda3a66"}', 'expires': '2026-09-09T13:54:06+00:00'}]}
+```
+
+`team_id` and `service_id` accept integers or `None` (no filter). When both are
+supplied, both must match. Filtering happens before decoding. By default, each
+selected row's `open_data` string is first decoded as strict base64 if valid;
+otherwise the original string is used. The resulting payload is then parsed
+as JSON and must be a dictionary, which replaces the row's `open_data` string.
+Other fields and row order are preserved. Set `decode=False` to skip payload
+decoding entirely.
+
+Successful calls return `{'code': OpenDataResult.SUCCESS, 'list': [...]}`.
+Any request, filtering, or decoding failure returns only
+`{'code': OpenDataResult.ERROR}`. Decoding stops at the first failed row;
+no partial list is returned.
 
 ## License
 MIT @ [VolgaCTF](https://github.com/VolgaCTF)

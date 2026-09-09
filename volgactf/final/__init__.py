@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import os
 
 import click
@@ -10,6 +11,7 @@ from .capsule_api import (
 from .service_api import (
     ListResult, GetServiceStatusResult, ServiceAPIHelper
 )
+from .open_data_api import OpenDataResult, OpenDataAPIHelper
 
 
 def get_api_endpoint():
@@ -174,3 +176,21 @@ def service_status(service_ids):
                       exception_handler=print_request_exception,
                       proxy=get_proxy(), verify=get_verify())
     print_service_status_results(h.get_status(*service_ids))
+
+
+def print_open_data_result(r):
+    if r['code'] == OpenDataResult.SUCCESS:
+        click.echo(click.style(r['code'].name, bold=True, fg='green'))
+        click.echo(json.dumps(r['list'], indent=2))
+    else:
+        click.echo(click.style(r['code'].name, bold=True, fg='red'))
+
+
+@cli.command(name='open_data')
+@click.option('--team-id', type=int, default=None, help='Filter by team ID.')
+@click.option('--service-id', type=int, default=None, help='Filter by service ID.')
+@click.option('--no-decode', is_flag=True, help='Keep open_data payload strings as-is.')
+def open_data(team_id, service_id, no_decode):
+    """Fetch jury open data, optionally filtered by team and service."""
+    h = OpenDataAPIHelper(get_api_endpoint(), proxy=get_proxy(), verify=get_verify())
+    print_open_data_result(h.open_data(team_id=team_id, service_id=service_id, decode=not no_decode))
