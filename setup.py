@@ -11,11 +11,15 @@ about_filename = os.path.join(
 with io.open(about_filename, 'rb') as fp:
     exec(fp.read(), about)
 
+with io.open('README.md', encoding='utf-8') as fp:
+    long_description = fp.read()
 
 setup(
     name='volgactf.final',
     version=about['__version__'],
     description='VolgaCTF Final CLI & public API library',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     author='VolgaCTF',
     author_email='it@volgactf.ru',
     url='https://github.com/VolgaCTF/volgactf-final-py',
@@ -38,6 +42,7 @@ setup(
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
         'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
     ],
     namespace_packages=[
         'volgactf'
